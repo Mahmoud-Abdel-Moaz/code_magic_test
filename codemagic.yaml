@@ -145,8 +145,8 @@ workflows:
     scripts:
      # - *get_assets #Getting client assets from S3 bucket
 
-      - name: Set up keystore
-        script: echo $CM_KEYSTORE | base64 --decode > $CM_KEYSTORE_PATH
+     # - name: Set up keystore
+      #  script: echo $CM_KEYSTORE | base64 --decode > $CM_KEYSTORE_PATH
 
       - name: Change Android app name
         script: sed -i.bak "s/android:label=.*/android:label=\"$APP_NAME\"/g" android/app/src/main/AndroidManifest.xml
@@ -169,5 +169,8 @@ workflows:
         script: flutter packages pub get
 
       - name: Flutter release apk
-        script: flutter build apk
-
+        script: |
+          flutter packages pub get
+          flutter build apk --release
+    artifacts:
+      - build/**/outputs/flutter-apk/*.apk
