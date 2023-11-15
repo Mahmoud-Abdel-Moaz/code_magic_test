@@ -151,10 +151,10 @@ workflows:
       - name: Change Android app name
         script: sed -i.bak "s/android:label=.*/android:label=\"$APP_NAME\"/g" android/app/src/main/AndroidManifest.xml
 
-      - name: Change Android package name
-        script: |
-          echo "android {  defaultConfig { applicationId '${PACKAGE_NAME}' }  }" > android/changePackage.gradle
-          echo "apply from: rootProject.file('changePackage.gradle')" >> android/app/build.gradle
+#      - name: Change Android package name
+#        script: |
+#          echo "android {  defaultConfig { applicationId '${PACKAGE_NAME}' }  }" > android/changePackage.gradle
+#          echo "apply from: rootProject.file('changePackage.gradle')" >> android/app/build.gradle
 
      # - name: Change Android icons
      #   script: cp -r ./$ASSETS_FOLDER/$ANDROID_ASSETS_FOLDER/* ./android/app/src/main/res
