@@ -169,7 +169,6 @@ workflows:
         script: flutter packages pub get
 
       - name: Flutter release apk
-        script: |
-          flutter build apk
+        script: flutter build apk
     artifacts:
       - build/**/outputs/flutter-apk/*.apk
