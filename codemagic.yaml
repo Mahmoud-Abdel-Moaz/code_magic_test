@@ -10,7 +10,8 @@ definitions:
         ASSETS_FOLDER=assets_${CLIENT_ID}
         echo "ASSETS_FOLDER=$ASSETS_FOLDER" >> $CM_ENV
         
-        aws s3 cp s3://$S3_BUCKET_NAME/$ASSETS_FOLDER.zip $ASSETS_FOLDER.zip
+      #  aws s3 cp s3://$S3_BUCKET_NAME/$ASSETS_FOLDER.zip $ASSETS_FOLDER.zip
+        echo CM_ASSETS | base64 --decode > $ASSETS_FOLDER.zip
         unzip $ASSETS_FOLDER.zip -d $ASSETS_FOLDER
 
 
@@ -143,7 +144,7 @@ workflows:
     #  vars:
      #   <<: *env_vars
     scripts:
-     # - *get_assets #Getting client assets from S3 bucket
+      - *get_assets #Getting client assets from S3 bucket
 
       - name: Set up keystore
         script: echo $CM_KEYSTORE | base64 --decode > $CM_KEYSTORE_PATH
@@ -156,14 +157,14 @@ workflows:
           echo "android {  defaultConfig { applicationId '${PACKAGE_NAME}' }  }" > android/changePackage.gradle
           echo "apply from: rootProject.file('changePackage.gradle')" >> android/app/build.gradle
 
-     # - name: Change Android icons
-     #   script: cp -r ./$ASSETS_FOLDER/$ANDROID_ASSETS_FOLDER/* ./android/app/src/main/res
+      - name: Change Android icons
+        script: cp -r ./$ASSETS_FOLDER/$ANDROID_ASSETS_FOLDER/* ./android/app/src/main/res
 
       - name: Set client .env file
         script: echo $DOTENV | base64 --decode > assets/client.env
 
-     # - name: Set main image # An image that being used in this sample project
-     #   script: cp -r ./$ASSETS_FOLDER/hero.png assets/hero.png
+      - name: Set main image # An image that being used in this sample project
+        script: cp -r ./$ASSETS_FOLDER/hero.png assets/hero.png
 
       - name: Install dependencies
         script: flutter packages pub get
