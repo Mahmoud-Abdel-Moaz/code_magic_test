@@ -145,16 +145,16 @@ workflows:
     scripts:
      # - *get_assets #Getting client assets from S3 bucket
 
-     # - name: Set up keystore
-      #  script: echo $CM_KEYSTORE | base64 --decode > $CM_KEYSTORE_PATH
+      - name: Set up keystore
+        script: echo $CM_KEYSTORE | base64 --decode > $CM_KEYSTORE_PATH
 
       - name: Change Android app name
         script: sed -i.bak "s/android:label=.*/android:label=\"$APP_NAME\"/g" android/app/src/main/AndroidManifest.xml
 
-#      - name: Change Android package name
-#        script: |
-#          echo "android {  defaultConfig { applicationId '${PACKAGE_NAME}' }  }" > android/changePackage.gradle
-#          echo "apply from: rootProject.file('changePackage.gradle')" >> android/app/build.gradle
+      - name: Change Android package name
+        script: |
+          echo "android {  defaultConfig { applicationId '${PACKAGE_NAME}' }  }" > android/changePackage.gradle
+          echo "apply from: rootProject.file('changePackage.gradle')" >> android/app/build.gradle
 
      # - name: Change Android icons
      #   script: cp -r ./$ASSETS_FOLDER/$ANDROID_ASSETS_FOLDER/* ./android/app/src/main/res
@@ -170,7 +170,6 @@ workflows:
 
       - name: Flutter release apk
         script: |
-          flutter packages pub get
-          flutter build apk --release
+          flutter build apk
     artifacts:
       - build/**/outputs/flutter-apk/*.apk
