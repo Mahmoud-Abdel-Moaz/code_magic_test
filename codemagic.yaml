@@ -162,8 +162,8 @@ workflows:
       - name: Set client .env file
         script: echo $DOTENV | base64 --decode > assets/client.env
 
-    #  - name: Set main image # An image that being used in this sample project
-   #     script: cp -r ./$ASSETS_FOLDER/hero.png assets/hero.png
+      - name: Set main image # An image that being used in this sample project
+        script: cp -r ./$ASSETS_FOLDER/hero.png assets/hero.png
 
       - name: Install dependencies
         script: flutter packages pub get
