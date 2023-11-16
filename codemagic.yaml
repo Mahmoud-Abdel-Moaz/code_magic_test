@@ -7,7 +7,7 @@ definitions:
     - &get_assets
       name: Get assets from AWS S3 bucket
       script: |
-        ASSETS_FOLDER=assets
+        ASSETS_FOLDER=assets_${CLIENT_ID}
         echo "ASSETS_FOLDER=$ASSETS_FOLDER" >> $CM_ENV
         
         echo $CM_ASSETS | base64 --decode > $ASSETS_FOLDER.zip
@@ -157,7 +157,7 @@ workflows:
           echo "apply from: rootProject.file('changePackage.gradle')" >> android/app/build.gradle
 
       - name: Change Android icons
-        script: cp -r ./$ASSETS_FOLDER/$ANDROID_ASSETS_FOLDER/* ./android/app/src/main/res
+        script: cp -r ./$ASSETS_FOLDER/assets_${CLIENT_ID}/$ANDROID_ASSETS_FOLDER/* ./android/app/src/main/res
 
       - name: Set client .env file
         script: echo $DOTENV | base64 --decode > assets/client.env
