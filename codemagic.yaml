@@ -7,7 +7,7 @@ definitions:
     - &get_assets
       name: Get assets from AWS S3 bucket
       script: |
-        ASSETS_FOLDER=assets_${CLIENT_ID}
+        ASSETS_FOLDER=assets
         echo "ASSETS_FOLDER=$ASSETS_FOLDER" >> $CM_ENV
         
         echo $CM_ASSETS | base64 --decode > $ASSETS_FOLDER.zip
