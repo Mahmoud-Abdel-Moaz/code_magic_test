@@ -19,7 +19,7 @@ workflows:
                 "labels": ["building-all","'$CLIENT'"],
                 "environment": {
                   "variables": {
-                    "CLIENT_ID": "'{$CLIENT}'"
+                    "CLIENT_ID": "'$CLIENT'"
                    },
                   "groups": [
                      "'wl_${CLIENT}'"
