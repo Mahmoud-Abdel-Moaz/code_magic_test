@@ -1,178 +1,30 @@
-definitions:
-  env_vars: &env_vars
-    S3_BUCKET_NAME: cmwhitelabel # The name of your S3 bucket that have all of your clients assets.
-    ANDROID_ASSETS_FOLDER: res # The name of your folder in S3 bucket that have the client's Android assets from (/android/app/src/main/res/).
-    IOS_ASSETS_FOLDER: AppIcon.appiconset # The name of your folder in S3 bucket that have the client's iOS assets from (/ios/Runner/Assets.xcassets/).
-  scripts:
-    - &get_assets
-      name: Get assets from AWS S3 bucket
-      script: |
-        ASSETS_FOLDER=assets_${CLIENT_ID}
-        echo "ASSETS_FOLDER=$ASSETS_FOLDER" >> $CM_ENV
-        
-        echo $CM_ASSETS | base64 --decode > $ASSETS_FOLDER.zip
-        unzip $ASSETS_FOLDER.zip -d $ASSETS_FOLDER
-
 
 # Builds will be triggered via Codemagic's REST API with the $CLIENT_ID variable and the WL_CLIENT_ID environment group in the payload
 workflows:
-  ios-client-release:
-    name: iOS client release
-    instance_type: mac_mini_m1
-    labels:
-      - ${CLIENT_ID} # Helpful when you open your Codemagic's builds page
-    environment:
-      groups:
-        - aws_credentials # Includes (AWS_ACCESS_KEY_ID, AWS_SECRET_ACCESS_KEY, AWS_DEFAULT_REGION)
-      vars:
-        <<: *env_vars
-        XCODE_SCHEME: "Runner"
+  # Pass these variables when using this workflow: (CLIENTS[], BRANCH, APP_ID, WORKFLOW_ID) and this group (cm_credentials)
+  trigger_all_workflow:
+    name: Triggering build for all clients
     scripts:
-      - *get_assets #Getting client assets from S3 bucket
-
-      - name: Change iOS app name
-        script: /usr/libexec/PlistBuddy -c "Set :CFBundleName $APP_NAME" -c "Set :CFBundleDisplayName $APP_NAME" ios/${XCODE_SCHEME}/Info.plist
-
-      - name: Set bundle id
-        script: sed -i '' -e 's/PRODUCT_BUNDLE_IDENTIFIER \= [^\;]*\;/PRODUCT_BUNDLE_IDENTIFIER = '${BUNDLE_ID}';/' ios/${XCODE_SCHEME}.xcodeproj/project.pbxproj
-
-      - name: Change iOS icons
-        script: cp -r ./$ASSETS_FOLDER/$IOS_ASSETS_FOLDER ios/${XCODE_SCHEME}/Assets.xcassets/
-
-      - name: Set client client.env file
-        script: echo $DOTENV | base64 --decode > assets/client.env
-
-      - name: Set main image # An image that being used in this sample project
-        script: cp -r ./$ASSETS_FOLDER/hero.png assets/hero.png
-
-      - name: Install pods
-        script: find . -name "Podfile" -execdir pod install \;
-
-      - name: iOS code signing
+      - name: Trigger Builds
         script: |
-          keychain initialize
-          app-store-connect fetch-signing-files "$BUNDLE_ID" --type IOS_APP_STORE --create
-          keychain add-certificates
-          xcode-project use-profiles
-
-      - name: Install dependencies
-        script: flutter packages pub get
-
-      - name: Flutter build ipa and automatic versioning
-        script: |
-          BUILD_NUMBER=$(($(app-store-connect get-latest-testflight-build-number "$APP_STORE_ID") + 1))
-          flutter build ipa --release \
-          --build-name=1.0.$BUILD_NUMBER \
-          --build-number=$BUILD_NUMBER\
-          --export-options-plist=/Users/builder/export_options.plist
-    artifacts:
-      - build/ios/ipa/*.ipa
-      - /tmp/xcodebuild_logs/*.log
-      - test-results/flutter.json
-      - $HOME/Library/Developer/Xcode/DerivedData/**/Build/**/*.dSYM
-    publishing:
-      app_store_connect:
-        api_key: $APP_STORE_CONNECT_PRIVATE_KEY
-        key_id: $APP_STORE_CONNECT_KEY_IDENTIFIER
-        issuer_id: $APP_STORE_CONNECT_ISSUER_ID
-      email:
-        recipients:
-          - name@mail.com
-
-  android-client-release:
-    name: Android client release
-    instance_type: mac_mini_m1
-    labels:
-      - ${CLIENT_ID} # Helpful when you open your Codemagic's builds page
-    environment:
-      groups:
-        - aws_credentials # Includes (AWS_ACCESS_KEY_ID, AWS_SECRET_ACCESS_KEY, AWS_DEFAULT_REGION)
-      vars:
-        <<: *env_vars
-    scripts:
-      - *get_assets #Getting client assets from S3 bucket
-
-      - name: Set up keystore
-        script: echo $CM_KEYSTORE | base64 --decode > $CM_KEYSTORE_PATH
-
-      - name: Change Android app name
-        script: sed -i.bak "s/android:label=.*/android:label=\"$APP_NAME\"/g" android/app/src/main/AndroidManifest.xml
-
-      - name: Change Android package name
-        script: |
-          echo "android {  defaultConfig { applicationId '${PACKAGE_NAME}' }  }" > android/changePackage.gradle
-          echo "apply from: rootProject.file('changePackage.gradle')" >> android/app/build.gradle
-
-      - name: Change Android icons
-        script: cp -r ./$ASSETS_FOLDER/$ANDROID_ASSETS_FOLDER/* ./android/app/src/main/res
-
-      - name: Set client client.env file
-        script: echo $DOTENV | base64 --decode > assets/client.env
-
-      - name: Set main image # An image that being used in this sample project
-        script: cp -r ./$ASSETS_FOLDER/hero.png assets/hero.png
-
-      - name: Install dependencies
-        script: flutter packages pub get
-
-      - name: Flutter build aab and automatic versioning
-        script: |
-          BUILD_NUMBER=$(($(google-play get-latest-build-number --package-name "$PACKAGE_NAME" --tracks="$GOOGLE_PLAY_TRACK") + 1))
-          flutter build appbundle --release \
-          --build-name=1.0.$BUILD_NUMBER \
-          --build-number=$BUILD_NUMBER
-    artifacts:
-      - build/**/outputs/**/*.aab
-      - test-results/flutter.json
-    publishing:
-      google_play:
-        credentials: $GCLOUD_SERVICE_ACCOUNT_CREDENTIALS
-        track: internal
-      email:
-        recipients:
-          - name@mail.com
-
-  android-workflow-qa:
-    name: Android workflow qa
-    instance_type: mac_mini_m1
-    labels:
-      - ${CLIENT_ID} # Helpful when you open your Codemagic's builds page
-    environment:
-    #  groups:
-    #    - aws_credentials # Includes (AWS_ACCESS_KEY_ID, AWS_SECRET_ACCESS_KEY, AWS_DEFAULT_REGION)
-      vars:
-        <<: *env_vars
-    scripts:
-      - *get_assets #Getting client assets from S3 bucket
-
-      - name: Set up keystore
-        script: echo $CM_KEYSTORE | base64 --decode > $CM_KEYSTORE_PATH
-
-      - name: Set up firebase
-        script: echo $CM_FIREBASE | base64 --decode > ./android/app/google-services.json
-
-      - name: Change Android app name
-        script: sed -i.bak "s/android:label=.*/android:label=\"$APP_NAME\"/g" android/app/src/main/AndroidManifest.xml
-
-      - name: Change Android package name
-        script: |
-          echo "android {  defaultConfig { applicationId '${PACKAGE_NAME}' }  }" > android/changePackage.gradle
-          echo "apply from: rootProject.file('changePackage.gradle')" >> android/app/build.gradle
-
-      - name: Change Android icons
-        script: cp -r ./$ASSETS_FOLDER/assets_${CLIENT_ID}/$ANDROID_ASSETS_FOLDER/* ./android/app/src/main/res
-
-      - name: Set client client.env file
-        script: echo $DOTENV | base64 --decode > client.env
-
-    #  - name: Set main image # An image that being used in this sample project
-    #    script: cp -r ./$ASSETS_FOLDER/hero.png assets/hero.png
-
-      - name: Install dependencies
-        script: flutter packages pub get
-
-      - name: Flutter release apk
-        script: |
-          flutter build apk --release
-    artifacts:
-      - build/**/outputs/flutter-apk/*.apk
+          array=($(echo "${CLIENTS}" | tr ',' ' '))
+          for CLIENT in "${array[@]}"; do
+            echo "Starting build for client: $CLIENT"
+            curl -H "Content-Type: application/json" -H "x-auth-token: ${CM_API_KEY}" \
+              --data '{
+                "appId": "'$APP_ID'", 
+                "workflowId": "'$WORKFLOW_ID'",
+                "branch": "'$BRANCH'",
+                "sshAccessEnabled":false,
+                "labels": ["building-all","'$CLIENT'"],
+                "environment": {
+                  "variables": {
+                    "CLIENT_ID": "'{$CLIENT}'"
+                   },
+                  "groups": [
+                     "'wl_${CLIENT}'"
+                   ]
+                }
+              }' \
+            https://api.codemagic.io/builds
+          done
