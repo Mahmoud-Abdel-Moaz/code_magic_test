@@ -14,6 +14,7 @@ void main() async {
   WidgetsFlutterBinding.ensureInitialized();
   await dotenv.load(fileName: 'client.env');
   await Firebase.initializeApp();
+  _setColorTheme();
   colorsTheme = GreenColors();
   runApp(const MyApp());
 }
