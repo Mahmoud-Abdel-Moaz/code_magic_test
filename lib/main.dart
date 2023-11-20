@@ -1,5 +1,6 @@
 import 'dart:convert';
 
+import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:http/http.dart' as http;
@@ -11,9 +12,9 @@ late MainColors colorsTheme;
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
-  // await dotenv.load(fileName: 'client.env');
-  //await Firebase.initializeApp();
-  // _setColorTheme();
+  await dotenv.load(fileName: 'client.env');
+  await Firebase.initializeApp();
+  _setColorTheme();
   runApp(const MyApp());
 }
 
@@ -33,8 +34,7 @@ class MyApp extends StatelessWidget {
   // This widget is the root of your application.
   @override
   Widget build(BuildContext context) {
-    // String appTitle = dotenv.env['TITLE']!;
-    String appTitle = 'Red';
+    String appTitle = dotenv.env['TITLE']!;
     return MaterialApp(
       title: appTitle,
       debugShowCheckedModeBanner: false,
@@ -74,7 +74,7 @@ class _MyHomePageState extends State<MyHomePage> {
 
   @override
   void initState() {
-    //getData();
+    getData();
     super.initState();
   }
 
@@ -94,11 +94,11 @@ class _MyHomePageState extends State<MyHomePage> {
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: <Widget>[
-            /* Image.asset(
+            Image.asset(
               'assets/logo.png',
               height: 100,
               width: 100,
-            ),*/
+            ),
             const SizedBox(
               height: 16,
             ),
