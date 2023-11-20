@@ -15,7 +15,6 @@ void main() async {
   await dotenv.load(fileName: 'client.env');
   await Firebase.initializeApp();
   _setColorTheme();
-  colorsTheme = GreenColors();
   runApp(const MyApp());
 }
 
