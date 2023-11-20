@@ -1,4 +1,4 @@
-package com.codemagic.red
+package com.codemagic.tshirt
 
 import io.flutter.embedding.android.FlutterActivity
 

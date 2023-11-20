@@ -19,10 +19,13 @@ void main() async {
 }
 
 _setColorTheme() {
-  if (dotenv.env['THEME'] == 'blue') {
+  String? selectedTheme = dotenv.env['THEME'];
+  if (selectedTheme == 'blue') {
     colorsTheme = BlueColors();
-  } else if (dotenv.env['THEME'] == 'red') {
+  } else if (selectedTheme == 'red') {
     colorsTheme = RedColors();
+  } else if (selectedTheme == 'yellow') {
+    colorsTheme = YellowColors();
   } else {
     colorsTheme = GreenColors();
   }

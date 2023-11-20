@@ -31,3 +31,11 @@ class RedColors extends MainColors {
   Color fabColor = Colors.blue;
   Color descColor = Colors.orange;
 }
+
+class YellowColors extends MainColors {
+  Color backgroundColor = Colors.yellow;
+  Color appBarColor = Colors.yellowAccent;
+  Color textColor = Colors.black;
+  Color fabColor = Colors.green;
+  Color descColor = Colors.orange;
+}
