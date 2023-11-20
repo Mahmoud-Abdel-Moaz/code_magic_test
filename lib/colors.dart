@@ -23,3 +23,11 @@ class BlueColors extends MainColors {
   Color fabColor = Colors.red;
   Color descColor = Colors.grey;
 }
+
+class RedColors extends MainColors {
+  Color backgroundColor = Colors.red;
+  Color appBarColor = Colors.redAccent;
+  Color textColor = Colors.black;
+  Color fabColor = Colors.blue;
+  Color descColor = Colors.orange;
+}

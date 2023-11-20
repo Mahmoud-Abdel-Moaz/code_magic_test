@@ -21,6 +21,8 @@ void main() async {
 _setColorTheme() {
   if (dotenv.env['THEME'] == 'blue') {
     colorsTheme = BlueColors();
+  } else if (dotenv.env['THEME'] == 'red') {
+    colorsTheme = RedColors();
   } else {
     colorsTheme = GreenColors();
   }
