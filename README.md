@@ -18,19 +18,18 @@ flutter pub run flutter_launcher_icons
 
 6-create new group of variables for new client at code magic 
 
-7- to encode 64 use => cat assets_red.zip | base64 | pbcopy
-
-
+7- add client variables in client group if file we encode base64 it before added 
+using command => cat assets_red.zip | base64 | pbcopy
+variables :-
 CM_KEYSTORE => keystore file
 CM_KEYSTORE_PATH => keystore Path
 CM_KEYSTORE_PASSWORD => keystore password
 CM_KEY_ALIAS => keystore alias
-CM_KEY_PASSWORD => key password 
+CM_KEY_PASSWORD => key password
 CM_FIREBASE => firebase google-services file
 APP_NAME => app name
 PACKAGE_NAME => package name
 DOTENV => .env file
 CM_ASSETS => Assets Folder
-
 
 
